@@ -1,0 +1,31 @@
+name: Fix Gemfile.lock
+
+on:
+  workflow_dispatch: # This allows you to run the action manually from the Actions tab
+
+jobs:
+  fix-lockfile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Critical: allows the action to push changes back to the repo
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2' # Change this to match your project's Ruby version
+          bundler-cache: false # Disable cache to ensure a fresh install
+
+      - name: Install dependencies
+        run: |
+          bundle config set frozen 'false'
+          bundle install
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update Gemfile.lock via GitHub Action"
+          file_pattern: Gemfile.lock
